@@ -135,14 +135,14 @@ class EB_MVAPICH2(ConfigureMake):
         Custom sanity check for MVAPICH2
         """
         shlib_ext = get_shared_lib_ext()
-        binaries = ['bin/%s' % x for x in ['mpicc', 'mpicxx', 'mpif77', 'mpif90', 'mpiexec.hydra']]
-        directories = ['include']
         if LooseVersion(self.version) < LooseVersion('2.1'):
-            libraries = ['lib/lib%s' % y for x in ['fmpich', 'mpichcxx', 'mpichf90', 'mpich', 'mpl', 'opa']
-                                      for y in ['%s.a' % x, '%s.%s' % (x, shlib_ext)]]
+            libnames = ['fmpich', 'mpichcxx', 'mpichf90', 'mpich', 'mpl', 'opa']
         else:
-            libraries = ['lib/lib%s' % y for x in ['mpi', 'mpicxx', 'mpifort']
-                                      for y in ['%s.a' % x, '%s.%s' % (x, shlib_ext)]]
-            
-        custom_paths = { 'files': binaries + libraries,  'dirs': directories }
+            libnames = ['mpi', 'mpicxx', 'mpifort']
+
+        custom_paths = {
+            'files': ['bin/%s' % x for x in ['mpicc', 'mpicxx', 'mpif77', 'mpif90', 'mpiexec.hydra']] +
+                     ['lib/lib%s.%s' % (l, e) for l in libnames for e in ['a', shlib_ext]],
+            'dirs': ['include'],
+        }
         super(EB_MVAPICH2, self).sanity_check_step(custom_paths=custom_paths)
